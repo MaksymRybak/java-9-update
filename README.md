@@ -209,4 +209,4 @@ E' stato aggiunto supporto a SHA-3
 JEPs x esplorare le proposte fatte per migliorare Java  
 JEP - Java Enhancement Proposal  
 
-![The_Modular_JDK_-_Explicit_Dependencies](uploads/0224f393d116a2717fb59df2ffafb0dc/The_Modular_JDK_-_Explicit_Dependencies.jpg)
+
