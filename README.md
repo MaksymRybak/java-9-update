@@ -21,7 +21,7 @@ il motivo perche' e' stato introdotto:
 Java8 e prima: 
 *  JVM carica tutti file JAR in una singolo e piatto classpath
 *  classpath molto fragile, non abbiamo la possibilita' di negare ad una classe di accedere ad un'altra a runtime  
-*  file JAR ragruppano i file, ma a runtime, una classe di un JAR puo' accedere a qualsiasi classe di altri JAR presenti nel classpath  
+*  file JAR raggruppano i file, ma a runtime, una classe di un JAR puo' accedere a qualsiasi classe di altri JAR presenti nel classpath  
 
 con Java9 e sistema modulare vengono rilasciati > 90 moduli (es. java.base, java.logging, java.xml, jdk.httpserver, java.sql, java.prefs, etc...) vedi lo schemino in basso
 
@@ -33,8 +33,8 @@ con Java9 e sistema modulare vengono rilasciati > 90 moduli (es. java.base, java
 
 caratteristiche di un modulo  
 * ha il nome  
-* e' autocontenuto  
-* ragruppa il codice relativo  
+* e' auto contenuto  
+* raggruppa il codice relativo  
 * ha una sezione esposta all'esterno ed una interna  
 * file module-info.java definisce il descrittore del modulo  
 * 	di default i packages usati nel modulo non sono esportati  
@@ -51,11 +51,11 @@ la compilazione non cambia se:
 unnamed module e' un modulo speciale in JVM, acquisisce automaticamente le dipendenze dalla JDK modulare, per far funzionare codice vecchio in Java9, hanno applicato 2 compromessi:  
 *  il vecchio codice puo' continuare a referenziare i tipi incapsulati in Java9, ricevendo un warning nel momento di compilazione con Java8. Da aggiungere questo punto al debito tecnico, che deve essere risolto nel tempo, per non avere i problemi futuri nell'aggiornamento di Java, JDK, librerie terzi.  
 Recap: il codice compilato con Java8 puo' girare con Java9  
-*  Invece se compiliamo il nostro codice con Java9, l'errore e' bloccante, qui non possiamo continuare e siamo obbligati ad addattarsi alla regola di moduli  
+*  Invece se compiliamo il nostro codice con Java9, l'errore e' bloccante, qui non possiamo continuare e siamo obbligati ad adattarsi alla regola di moduli  
 NOTA: x forzare la negazione di eseguire il codice compilato con Java8 (e che usa i tipi incapsulati) in Java9 , possiamo passare il parametro --illegal-access=deny al comando java  
 (viene sollevata l'eccezione se si verifica questa casistica)  
 Se questo problema ha una nostra libreria esterna, dobbiamo notificare il fornitore richiedendo la modifica / scarica nuova versione.  
-Possiamo cmq aggiungere i paramentri nel compilatore (javac) e runtime java, in modo di poter continuare ad usare i tipi incapsulati in Java9. (NON E' CONSIGLIATO)  
+Possiamo cmq aggiungere i parametri nel compilatore (javac) e runtime java, in modo di poter continuare ad usare i tipi incapsulati in Java9. (NON E' CONSIGLIATO)  
 Jdeps - e' un nuovo tool introdotto per poter scansionare il nostro codice e determinare se da qualche parte usiamo i tipi incapsulati, in piu' abbiamo anche dei suggerimenti sui tipi che possiamo usare.  
 2.  esempio, se prima usavamo java.xml.bind che era' in JSE, ma all'interno del package relativo a qualche estensione EE portata in JSE, con Java9 questo modulo non e' piu' all'interno di java.se ma e' stato spostato sotto java.se.ee -> questo fa fallire la compilazione con Java9, ma possiamo aggiungere il modulo mancante usando i parametri del compilatore  
 es. javac --add-modules java.xml.bind Main.java, stessa cosa dobbiamo fare anche quando avviamo l'app, aggiungendo stesso modulo al runtime java  
@@ -65,7 +65,7 @@ Recap: con Java9 abbiamo 2 possibilita', continuare ad usare classpath, o adotta
 #### Collection factory methods
 possiamo definire subito gli elementi della lista, prima con Java8 spesso usavamo Array.asList():  
 * List.of(N elementi), ritorna la lista immutabile (Immutable Collection)  
-* Set.of(N elementi), non possiamo aggiungere valori null, e valori dupplicati  
+* Set.of(N elementi), non possiamo aggiungere valori null, e valori duplicati  
 NOTA: implementazione del metodo statico of() nel tipo List prevede >10 override, x poter passare entro 10 elementi nel momento di creazione della lista, senza allocazioni di memoria aggiuntiva (es. se API usa varargs es. E... elements, varargs sono passati al metodo creando un array, idem per la classe Set)  
 * Map.of(), es. Map.of(key1, value1, key2, value2)  
 * Map.ofEntries(Map.entry(key, value), Map.entry(key, value)... )  
@@ -97,14 +97,14 @@ Java9 aggiunti
 NOTA: tale variabile deve essere final / effettivamente final, nel senso che si puo' referenziare un parametro non final passato al metodo, e compilatore deduce automaticamente che e' una variabile final - NON possiamo cambiare il riferimento di tale variabile nel corso di try-with-resources 
 *  miglioramento inferenza dei tipi in Generics: in java7/8 potevamo gia' usare diamond operator <>, es. ArrayList<String> arr = new ArrayList<>(); ma veniva sollevato un errore se usavamo una classe innestata anonima, e. new ArrayList<>() { @Override add(String str) { ... } }, in Java9 e' stata gestita questa casistica
 *  metodi private nell'interfacce (nota: i metodi definiti in una interfaccia sono public di default): in Java8 e' stato aggiunto default, x implementare una logica di default in una interfaccia in Java9, si puo' usare private davanti a default, x rendere l'implementazione di default nascosta all'interno di interfaccia
-## Altri moglioramenti
+## Altri miglioramenti
 #### Javadoc
 * supporta HTML5
 * supporta ricerca
 * supporta i Moduli
 * es. https://docs.oracle.com/javase/9/docs/api
 #### Localizzazione: 
-*  supporto a unicode e' stato aggiornato dalla versione 6.2 alla 8.0, ora sono supportati > 10000 nuovi caratteri file di proprieta (una lista di key=value, usato per es. per la traduzione di testi,label etc.) - prima la condifica era' ISO-8859-1, con Java9 e' stato fatto il passaggio a UTF-8
+*  supporto a unicode e' stato aggiornato dalla versione 6.2 alla 8.0, ora sono supportati > 10000 nuovi caratteri file di proprieta' (una lista di key=value, usato per es. per la traduzione di testi,label etc.) - prima la codifica era' ISO-8859-1, con Java9 e' stato fatto il passaggio a UTF-8
 *  Common Local Date Repository (CLDR): i formati in base alla localizzazione, x mappare impostazioni locali
 *  nuova API x DateTime (pachage java.time): nuovi metodi x la divisione della durata per durata standard(es. giorni, ore)
 ```
@@ -209,3 +209,4 @@ E' stato aggiunto supporto a SHA-3
 JEPs x esplorare le proposte fatte per migliorare Java  
 JEP - Java Enhancement Proposal  
 
+![The_Modular_JDK_-_Explicit_Dependencies](uploads/0224f393d116a2717fb59df2ffafb0dc/The_Modular_JDK_-_Explicit_Dependencies.jpg)
