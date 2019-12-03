@@ -42,6 +42,8 @@ caratteristiche di un modulo
 * 	NOTA: requires specifica il nome del Modulo, invece exports, il nome del package  
 * 	cmd x stampare il descrittore del modulo: java --list-modules, java --describe-module [nome]  
 
+Per un approfondimento piu' dettagliato fate riferimento a [java-9-modularity](https://github.com/MaksymRybak/java-9-update/blob/master/java-9-modularity.md)
+
 ## Migrazione di una app classpath based  
 la compilazione non cambia se:  
 1. la nostra app NON usa i tipi di JDK che sono stati incapsulati in Java9  
