@@ -62,5 +62,17 @@ A livello di module descriptor (`module-info.java`) abbiamo tre moduli "in gioco
 
 Il concetto di servizio disacoppia il consumatore e produttore.  
 Avendo la dipendenza dall'interfaccia, il consumer non va in errore se per qualche motivo non trova l'implementazione (es. il provider non ha eseguito la registrazione nel service registry).
+## Linking modules
+Con Java9 viene introdotta una nuova fase di sviluppo - linking.  
+Il tool di riferimento e' `jlink`.  
+Linking e' un modulo facoltativo intermedio tra il compilatore e runtime, creato per i moduli in modo da eseguire i collegamenti tra i moduli in modo opportuno prima di eseguire la nostra app a runtime.  
+Linking serve a:
+* creare custom runtime image (viene eseguita l'analisi di tutti file `module-info` determinando tutti i moduli che servono all'app per essere eseguita in modalita' stand alone), e' l'immagine con tutti i moduli necessari (sia custom che della piattaforma java). 
+* l'immagine e' ridotta confronto precedente app+jdk, miglioramento delle performance
+* ottimizzazione dell'intero programma, eliminando per esempio "il codice morto" non usato da nessuna parte del programma (quindi non viene caricato a runtime)  
 
-  
+E' stato creato il tool `jlink` usato per creare immagini di runtime custom.  
+E' un tool plugin based, e' possibile estenderlo implementando nuove ottimizzazioni.  
+es. eseguendo jlink passando il modulo `mymodule.cli`, `jlink` scansiona il suo descrittore, individua il modulo `mymodule.analysis` + il modulo referenziato implicitamente, `java.base`, e crea l'immagine di runtime che contiene solo questi tre moduli - ottimizzazione spazio disco e tempo di startup dell'app (jvm deve caricare solo questi tre moduli e non tutto il JDK come prima).  
+
+
