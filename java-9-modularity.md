@@ -46,3 +46,21 @@ I moduli non supportano la visibilita' transitiva, cioe', se il modulo X legge i
 #### Transitivita'
 In certi casi viene comodo avere l'accesso transitivo, per esempio `java.sql` dipende da `java.logging`, e un metodo public di `java.sql` ritorna il tipo di `java.logging`. Se la nostra app usa tale metodo dovrebbe in teoria definire il require anche del modulo `java.logging`. In alternativa, se modulo `java.sql` esegue l'import di `java.logging` come `require transitive`, anche la nostra app che esegue `require java.sql` ha accesso diretto a tutti i tipi public di `java.logging`.  
 Possiamo creare anche cosi detti moduli AGGREGATORI, dove viene creato un modulo senza codice con solo il module-info.java contenente `require transitive` di moduli concreti. Questo semplifica organizzazione delle nostre librerie e esposizione all'esterno delle funzionalita'.
+## Concetto di servizi
+Il concetto di servizi aiuta a esporre i servizi e non singoli package, e' un ragruppamento in modo da non esporre fuori tanti package.
+I servizi aiutano a rendere il nostro modulo estendibile piu' facilmente.  
+Servizi nel sistema modulare di java:
+* viene introdotto un layer in piu' tra il service consumer e service provider - service catalog/registry
+* service provider registra l'interfaccia e implementazione nel registry
+* service consumer richiede al service registry l'implementazione di una specifica interfaccia  
+NOTA: e' il service registry che crea una nuova istanza del servizio richiesto.  
+
+A livello di module descriptor (`module-info.java`) abbiamo tre moduli "in gioco"
+1. modulo che contiene l'interfaccia del servizio - interfaccia esportata nel descrittore  
+2. modulo che contiene il provider, chi implementa l'interfaccia - importa l'interfaccia, implementa interfaccia, esporta l'implementazione usando la sintassi `provides Impl with Interface` - NOTA: implementazione e' visibile solo al service registry, nessun altro modulo puo' richiedere direttamente l'implementazione  
+3. modulo che contiene il consumer, chi usa l'implementazione dell'interfaccia - richiede l'interfaccia, richiede l'imlpementazione dell'interfaccia al service registry usando il comando `uses <interface package>`, il codice del consumatore richiede al service registry l'istanza del servizio, es. `Iterable<MyService> services = ServiceLoader.load(MyService.class)`.  
+
+Il concetto di servizio disacoppia il consumatore e produttore.  
+Avendo la dipendenza dall'interfaccia, il consumer non va in errore se per qualche motivo non trova l'implementazione (es. il provider non ha eseguito la registrazione nel service registry).
+
+  
