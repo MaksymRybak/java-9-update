@@ -75,4 +75,26 @@ E' stato creato il tool `jlink` usato per creare immagini di runtime custom.
 E' un tool plugin based, e' possibile estenderlo implementando nuove ottimizzazioni.  
 es. eseguendo jlink passando il modulo `mymodule.cli`, `jlink` scansiona il suo descrittore, individua il modulo `mymodule.analysis` + il modulo referenziato implicitamente, `java.base`, e crea l'immagine di runtime che contiene solo questi tre moduli - ottimizzazione spazio disco e tempo di startup dell'app (jvm deve caricare solo questi tre moduli e non tutto il JDK come prima).  
 
+## Preparazione progetto x Java9
+Il concetto di classpath rimane.  
+Utilizzo dei moduli introdotti in Java9 rimane facoltativo, possiamo non creare `module-info.java`, consideriamo pero i benefici che otteniamo usandoli.  
+Se non usiamo i moduli, compilazione avviene in questo modo
+		`javac -cp $CLASSPATH ...`
+		`java -cp $CLASSPATH ...`
+Se non usiamo i moduli, Java9 comunque, dietro le quinte, usa il sistema modulare:  
+* per poter compilare con versioni nuove di java, senza usare i moduli, lanciamo i comandi standard 
+* java crea per la nostra app un modulo di default chiamato `unnamed` - modulo contenente tutto il classpath
+* modulo `unnamed` esporta tutto e puo' leggere tutti i moduli di jdk
+* se non usiamo i moduli, con Java9 cmq JDK e' stato diviso in moduli e li stiamo usando in modo trasparente per nostro codice, praticamente tutto il nostro classpath finisce nel modulo `unnamed`  
 
+Durante la migrazione a Java9 dobbiamo verificare che non stiamo utilizzando i tipi che sono stati incapsulati e non sono piu' accessibili dall'esterno. Per verificare incongruenze nel nostro codice con nuove versioni java possiamo usare il tool `jdeps` introdotto in Java8.  
+Se non siamo in grado di cambiare il codice sorgente (es. usiamo librerie di terzi che non hanno nuove versioni per java9), c'e' il seguente workaround:
+* nella fase di compilazione scriviamo `javac --add-exports java.base/sun.security.x509=ALL-UNNAMED Main.java`
+* nella fase di esecuzione scriviamo `java --add-exports java.base/sun.security.x509=ALL-UNNAMED Main`
+
+Se usiamo i tipi del modulo JavaSE che non sono quelli di default (es. i tipi che con Java9 non sono piu' disponibili di default, essendoci migrati nei moduli nuovi):
+* sono i tipi che sono fuori al modulo java.se (es. i tipi spostati nel modulo java.xml.ws, e altri moduli che sono piu' enterprise edition)
+* la soluzione e' usare il flag `--add-modules`, es. `javac --add-modules java.xml.bind Main.java`
+* idem per esecuzione `java --add-modules java.xml.bind Main`  
+
+E' sempre meglio usare jdeps per verificare questo tipo di errori
